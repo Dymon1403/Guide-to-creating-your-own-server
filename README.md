@@ -24,8 +24,8 @@
 
 # 2.1 Настройка BIOS/UEFI:
 
-    Restore on AC Power Loss: Найди пункт Power Management -> AC Power Recovery (или аналогичный) и выставь Power On. Теперь, если дома моргнет свет, сервер автоматически включится сам при появлении питания. 
-    Отключение лишнего: В BIOS отключи встроенный звук (Audio), Bluetooth и неиспользуемые порты, если они не нужны - это сэкономит пару ватт и уменьшит нагрев, что для сервака гуд
+Restore on AC Power Loss: Найди пункт Power Management -> AC Power Recovery (или аналогичный) и выставь Power On. Теперь, если дома моргнет свет, сервер автоматически включится сам при появлении питания. 
+Отключение лишнего: В BIOS отключи встроенный звук (Audio), Bluetooth и неиспользуемые порты, если они не нужны - это сэкономит пару ватт и уменьшит нагрев, что для сервака гуд
 
 # 2.2 WIFI Ethernet
  сука забудь нахуй навсегда про какие там сети, ток мужской кабель, wifi дает нестабильность + в linux мне потом спасибо скажешь, все автоматом подхватывается. Дальше, заходим в настройки роутера(192.168.0.1 or 192.168.0.1 standart) найди раздел DHCP Server -> Static Lease / Address Reservation и там дай stable IP твоему серверу, чтобы он всегда был доступен по одному и тому же адресу.
@@ -44,11 +44,9 @@
     В systemd (Debian/Ubuntu):
     Редактируем /etc/systemd/logind.conf:
 
-``` bash
     HandleLidSwitch=ignore
     HandleLidSwitchExternalPower=ignore
-    ```
-   
+    
     И применяем: sudo systemctl restart systemd-logind
 
     В runit / elogind (Void Linux):
