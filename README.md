@@ -47,7 +47,7 @@
 ``` bash
     HandleLidSwitch=ignore
     HandleLidSwitchExternalPower=ignore
-```
+    ```
    
     И применяем: sudo systemctl restart systemd-logind
 
