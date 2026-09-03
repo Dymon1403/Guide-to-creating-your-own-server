@@ -52,3 +52,36 @@ Restore on AC Power Loss: Найди пункт Power Management -> AC Power Rec
     В runit / elogind (Void Linux):
     Редактируем /etc/elogind/logind.conf и выставляем те же параметры HandleLidSwitch=ignore.
 
+  # 3.3 Настройка батареи (ноутбук)
+  Если батарея живая разумным вариантом будет поставить на ней отграничения по зарядке, поставь максимум гдето 60-80%, оптимальный вариант для лития. Акум умрет не так быстро от постоянной зарядки
+  есть много способов ограничения зарядки литийинонного аккумулятора, например TLP:
+  
+  *P.S. в гайде буду говорить сугубо про systemd дистры, например выше перечисленные Ubuntu Server или Debian*
+
+итак, ставим TLP:
+``` bash
+  sudo apt update && sudo apt install tlp
+
+```
+заходим в конфиг:
+```bash
+sudo vim /etc/tlp.conf
+
+```
+здесь нам надо раскомпилить 2 строчки:
+```bash
+START_CHARGE_THRESH_BAT0=60
+STOP_CHARGE_THRESH_BAT0=70
+
+```
+*START_CHARGE_THRESH_BAT0 - Заряд ПРИ котором начинается зарядка акума, ну и второй параметр STOP_CHARGE_THRESH_BAT0= - соответственно за ограничение зарядки ноута.*
+# Применение настроек батареи
+```bash
+sudo tlp start
+
+```
+проверка, подхватилось ли все?
+``` bash
+sudo tlp-stat -b
+
+```
