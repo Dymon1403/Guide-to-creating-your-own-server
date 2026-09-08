@@ -108,30 +108,31 @@ sudo nvim /usr/local/bin/power-monitor.sh
 2. Код
 ```bash
 #!/bin/bash
+AC_FILE=""
+for f in /sys/class/power_supply/{AC,ADP1,ACAD,AC0}/online; do
+    if [ -f "$f" ]; then
+        AC_FILE="$f"
+        break
+    fi
+done
+if [ -z "$AC_FILE" ]; then
+    echo "Ошибка: не найден файл статуса питания в /sys/class/power_supply/" >&2
+    exit 1
+fi
+AC_STATUS=$(cat "$AC_FILE" 2>/dev/null)
 
-# ПРОВЕРЬ СУКА СВОЙ АКУМ, КАК ОН НАЗЫВАЕТСЯ
-# На разных системах может быть AC, ADP1 или ACAD. Проверить можно через: ls /sys/class/power_supply/
-AC_STATUS=$(cat /sys/class/power_supply/AC/online 2>/dev/null || cat /sys/class/power_supply/ADP1/online)
-
-# Если AC_STATUS = 0, значит внешнее питание пропало
-#!/bin/bash
-
-# Проверяем статус подключения к сети
-```bash
-AC_STATUS=$(cat /sys/class/power_supply/AC/online 2>/dev/null || cat /sys/class/power_supply/ADP1/online)
-STATE_FILE="/tmp/power_outage_counter"
-
-if [ "$AC_STATUS" -eq 0 ]; then
-    COUNT=$(cat $STATE_FILE 2>/dev/null || echo 0)
+STATE_FILE="/var/tmp/power_outage_counter"
+if [ "$AC_STATUS" -eq 0 ] 2>/dev/null; then
+    COUNT=$(cat "$STATE_FILE" 2>/dev/null || echo 0)
     COUNT=$((COUNT + 1))
-    echo $COUNT > $STATE_FILE
+    echo "$COUNT" > "$STATE_FILE"
 
     if [ "$COUNT" -ge 60 ]; then
-        rm -f $STATE_FILE
+        rm -f "$STATE_FILE"
         /sbin/shutdown -h now
     fi
 else
-    rm -f $STATE_FILE
+    rm -f "$STATE_FILE"
 fi
 
 ```
@@ -279,7 +280,7 @@ Docker Compose позволяет описать всю конфигурацию
 ./data:/data (папка data рядом с файлом манифеста монтируется внутрь контейнера).
 
 2. Ports (Порты): Связываем порт сервера с портом контейнера:
-8080:8080(<Порт_Сервера>:<Порт_Контейнера>).
+25565:25565(<Порт_Сервера>:<Порт_Контейнера>).
 
 3. Restart Policy: Прописываем restart: unless-stopped, чтобы при перезагрузке сервера контейнер автоматически поднимался сам.
 
@@ -328,7 +329,7 @@ services:
     stdin_open: true
     restart: unless-stopped
     ports:
-      - "8080:8080" # Порт 8080 - стандарт и удобство
+      - "25565:25565"
     environment:
       EULA: "TRUE"
       TYPE: "PAPER"
@@ -343,6 +344,8 @@ services:
 
 ```
 
+*почему не порт 8080? потому что стандартный порт Java Edition Minecraft - 25565, слушайтесь и повенуйтесь*
+
 3.1 запуск
 ```bash
 docker compose up -d
@@ -350,7 +353,7 @@ docker compose up -d
 ```
 
 Ес че Docker сам скачает образ, загрузит PaperMC и сгенерирует мир. Это займет пару минут
-Теперь твой сервер Майна крутится в фоновом режиме на порту 25565. Вы можете заходить на него с друзьями внутри локалки по IP-адресу сервера (например, 192.168.1.100:8080).
+Теперь твой сервер Майна крутится в фоновом режиме на порту 25565. Вы можете заходить на него с друзьями внутри локалки по IP-адресу сервера (например, 192.168.1.100:25565).
 docker compose down чтобы вырубить docker 
 
 # А играть как???
